@@ -1,5 +1,6 @@
 package io.github.thesowut.mocker;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -9,24 +10,28 @@ public final class Mocker extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[Mocker] Plugin loaded.");
         getServer().getPluginManager().registerEvents(new MockerListener(), this);
-
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Mocker] Plugin disconnected.");
     }
 
     public class MockerListener implements Listener {
 
         @EventHandler
         public void onPlayerChat(AsyncPlayerChatEvent event) {
+            // If the player is an OP, don't mock him.
+            if (event.getPlayer().isOp()) return;
+
             // Cancel the sending of chat message by player.
             event.setCancelled(true);
             String playerName = event.getPlayer().getDisplayName();
+            // Mock the message sent by the player.
             String playerMessage = mockMessage(event.getMessage());
+            // Send the mocked message as if the player said it.
             getServer().broadcastMessage(String.format("<%s> %s", playerName, playerMessage));
         }
 
