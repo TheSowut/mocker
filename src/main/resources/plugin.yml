@@ -1,0 +1,5 @@
+name: Mocker
+version: '${project.version}'
+main: io.github.thesowut.mocker.Mocker
+api-version: 1.19
+authors: [ TheSowut ]
