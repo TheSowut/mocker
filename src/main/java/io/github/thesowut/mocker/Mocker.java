@@ -1,34 +1,54 @@
 package io.github.thesowut.mocker;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+
 public final class Mocker extends JavaPlugin {
+    private FileConfiguration _config = this.getConfig();
+    private ArrayList<String> mockedUsers;
+    private final String mockerTitle = ChatColor.DARK_GRAY
+            + "[" + ChatColor.DARK_PURPLE
+            + "MOCKER"
+            + ChatColor.DARK_GRAY + "] "
+            + ChatColor.WHITE;
 
     @Override
     public void onEnable() {
-        getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[Mocker] Plugin loaded.");
+        getServer().getConsoleSender().sendMessage(mockerTitle + ChatColor.GREEN + "Plugin enabled.");
         getServer().getPluginManager().registerEvents(new MockerListener(), this);
+        mockedUsers = (ArrayList<String>) _config.getStringList("mocked");
+
+        this.getCommand("mock").setExecutor(new onMock());
+
+        _config.addDefault("mocked", new ArrayList<String>());
+        _config.options().copyDefaults(true);
+        saveConfig();
     }
 
     @Override
     public void onDisable() {
-        getServer().getConsoleSender().sendMessage(ChatColor.RED + "[Mocker] Plugin disconnected.");
+        getServer().getConsoleSender().sendMessage(mockerTitle + ChatColor.RED + "Plugin disabled.");
     }
 
     public class MockerListener implements Listener {
 
         @EventHandler
         public void onPlayerChat(AsyncPlayerChatEvent event) {
-            // If the player is an OP, don't mock him.
-            if (event.getPlayer().isOp()) return;
+            // If the user isn't in the list of mocked users, do not mock him.
+            String playerName = event.getPlayer().getDisplayName();
+            if (!mockedUsers.contains(playerName.toLowerCase())) return;
 
             // Cancel the sending of chat message by player.
             event.setCancelled(true);
-            String playerName = event.getPlayer().getDisplayName();
             // Mock the message sent by the player.
             String playerMessage = mockMessage(event.getMessage());
             // Send the mocked message as if the player said it.
@@ -52,6 +72,28 @@ public final class Mocker extends JavaPlugin {
                 }
             }
             return new String(messageAsArr);
+        }
+    }
+
+    /**
+     * Invoked when a user calls the /mock method.
+     * Toggles mocking of a chosen user.
+     */
+    private class onMock implements CommandExecutor {
+        @Override
+        public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+            final String playerName = args[0].toLowerCase();
+            if (mockedUsers.contains(playerName)) {
+                sender.sendMessage(mockerTitle + args[0] + " will no longer be mocked.");
+                mockedUsers.remove(playerName);
+            } else {
+                sender.sendMessage(mockerTitle + args[0] + " will be mocked!");
+                mockedUsers.add(playerName);
+            }
+
+            _config.set("mocked", mockedUsers);
+            saveConfig();
+            return true;
         }
     }
 }

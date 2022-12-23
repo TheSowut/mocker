@@ -3,3 +3,8 @@ version: '${project.version}'
 main: io.github.thesowut.mocker.Mocker
 api-version: 1.19
 authors: [ TheSowut ]
+commands:
+  mock:
+    description: Toggle mocking of a player
+    usage: /<command> <player>
+    permission: mocker.mock
