@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -43,16 +44,16 @@ public final class Mocker extends JavaPlugin {
 
         @EventHandler
         public void onPlayerChat(AsyncPlayerChatEvent event) {
+            Player player = event.getPlayer();
             // If the user isn't in the list of mocked users, do not mock him.
-            String playerName = event.getPlayer().getDisplayName();
-            if (!mockedUsers.contains(playerName.toLowerCase())) return;
+            if (!mockedUsers.contains(player.getName().toLowerCase())) return;
 
             // Cancel the sending of chat message by player.
             event.setCancelled(true);
             // Mock the message sent by the player.
             String playerMessage = mockMessage(event.getMessage());
             // Send the mocked message as if the player said it.
-            getServer().broadcastMessage(String.format("<%s> %s", playerName, playerMessage));
+            getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), playerMessage));
         }
 
         /**
