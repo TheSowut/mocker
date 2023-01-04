@@ -1,28 +1,24 @@
 package io.github.thesowut.mocker.commands;
 
-import io.github.thesowut.mocker.Mocker;
+import io.github.thesowut.mocker.helpers.FileHelper;
 import io.github.thesowut.mocker.helpers.PluginHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
 
 public class MockerCommands implements CommandExecutor {
-    private final Mocker _main;
-    private final FileConfiguration _config;
+    private final FileHelper _fileHelper;
     private final PluginHelper _pluginHelper;
     private final ArrayList<String> _mockedUsers;
 
     public MockerCommands(
-            Mocker main,
-            FileConfiguration config,
+            FileHelper fileHelper,
             PluginHelper pluginHelper,
             ArrayList<String> mockedUsers
     ) {
-        this._main = main;
-        this._config = config;
+        this._fileHelper = fileHelper;
         this._pluginHelper = pluginHelper;
         this._mockedUsers = mockedUsers;
     }
@@ -38,8 +34,8 @@ public class MockerCommands implements CommandExecutor {
             _mockedUsers.add(playerName);
         }
 
-        _config.set("mocked", _mockedUsers);
-        _main.saveConfig();
+        _fileHelper.getMockedUsers().set("mocked", _mockedUsers);
+        _fileHelper.saveMockedUsers();
         return true;
     }
 }
