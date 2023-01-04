@@ -16,7 +16,7 @@ public final class Mocker extends JavaPlugin {
     private final FileHelper _fileHelper = new FileHelper(this, _pluginHelper);
     private ArrayList<String> _mockedUsers = (new ArrayList<>());
     private final MockerCommands _commands = new MockerCommands(_fileHelper, _pluginHelper, _mockedUsers);
-    private final MockerListener _listener = new MockerListener(this, _mockedUsers);
+    private final MockerListener _listener = new MockerListener(this, _config, _mockedUsers);
 
     @Override
     public void onEnable() {
@@ -43,6 +43,12 @@ public final class Mocker extends JavaPlugin {
      * Set default values for mocked users.
      */
     private void setDefaultData() {
+        // Set defaults for config.yml
+        _config.addDefault("mock_non_op_users", false);
+        _config.options().copyDefaults(true);
+        saveConfig();
+
+        // Set defaults for mocked_users.yml
         _fileHelper.getMockedUsers().addDefault("mocked", new ArrayList<String>());
         _fileHelper.getMockedUsers().options().copyDefaults(true);
         _fileHelper.saveMockedUsers();
