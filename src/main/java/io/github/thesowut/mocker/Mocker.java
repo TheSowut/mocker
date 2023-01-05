@@ -1,6 +1,7 @@
 package io.github.thesowut.mocker;
 
 import io.github.thesowut.mocker.commands.MockerCommands;
+import io.github.thesowut.mocker.helpers.FileHelper;
 import io.github.thesowut.mocker.helpers.PluginHelper;
 import io.github.thesowut.mocker.listeners.MockerListener;
 import org.bukkit.ChatColor;
@@ -11,21 +12,50 @@ import java.util.ArrayList;
 
 public final class Mocker extends JavaPlugin {
     private final FileConfiguration _config = this.getConfig();
-    private final ArrayList<String> mockedUsers = (ArrayList<String>) _config.getStringList("mocked");
     private final PluginHelper _pluginHelper = new PluginHelper();
-    private final MockerCommands _commands = new MockerCommands(this, _config, _pluginHelper, mockedUsers);
-    private final MockerListener _listener = new MockerListener(this, mockedUsers);
+    private final FileHelper _fileHelper = new FileHelper(this, _pluginHelper);
+    private ArrayList<String> _mockedUsers = (new ArrayList<>());
+    private final MockerCommands _commands = new MockerCommands(_fileHelper, _pluginHelper, _mockedUsers);
+    private final MockerListener _listener = new MockerListener(this, _fileHelper, _mockedUsers);
 
     @Override
     public void onEnable() {
         getServer().getConsoleSender().sendMessage(this._pluginHelper.title + ChatColor.GREEN + "Plugin enabled.");
         getServer().getPluginManager().registerEvents(this._listener, this);
+        this.loadMockedUsers();
+        this.setDefaultData();
 
-        this.getCommand("mock").setExecutor(_commands);
+        this._mockedUsers = (ArrayList<String>) _fileHelper.getMockedUsers().getStringList("mocked");
+        // Register all commands
+        ArrayList<String> pluginCommands = _commands.getCommands();
+        for (String command : pluginCommands) {
+            getCommand(command).setExecutor(_commands);
+        }
+    }
 
-        _config.addDefault("mocked", new ArrayList<String>());
+    /**
+     * Create & load list of mocked users.
+     */
+    private void loadMockedUsers() {
+        _fileHelper.setup();
+        _fileHelper.getMockedUsers().options().copyDefaults(true);
+        _fileHelper.saveMockedUsers();
+        saveConfig();
+    }
+
+    /**
+     * Set default values for mocked users.
+     */
+    private void setDefaultData() {
+        // Set defaults for config.yml
+        _config.addDefault(String.valueOf(FileHelper.ConfigKeys.mock_non_op_users), false);
         _config.options().copyDefaults(true);
         saveConfig();
+
+        // Set defaults for mocked_users.yml
+        _fileHelper.getMockedUsers().addDefault("mocked", new ArrayList<String>());
+        _fileHelper.getMockedUsers().options().copyDefaults(true);
+        _fileHelper.saveMockedUsers();
     }
 
     @Override

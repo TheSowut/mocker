@@ -1,6 +1,7 @@
 package io.github.thesowut.mocker.listeners;
 
 import io.github.thesowut.mocker.Mocker;
+import io.github.thesowut.mocker.helpers.FileHelper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,26 +10,27 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.ArrayList;
 
 public class MockerListener implements Listener {
-    private final ArrayList<String> _mockedUsers;
     private final Mocker _main;
+    private final FileHelper _fileHelper;
+    private final ArrayList<String> _mockedUsers;
 
-    public MockerListener(Mocker main, ArrayList<String> mockedUsers) {
+    public MockerListener(Mocker main, FileHelper fileHelper, ArrayList<String> mockedUsers) {
         this._main = main;
+        this._fileHelper = fileHelper;
         this._mockedUsers = mockedUsers;
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
+        // Check if all non op users should be mocked and player is non op.
+        if (_fileHelper.shouldMockAllNonOpPlayers() && !player.isOp()) {
+            this.sendMessage(event);
+            return;
+        }
         // If the user isn't in the list of mocked users, do not mock him.
         if (!this._mockedUsers.contains(player.getName().toLowerCase())) return;
-
-        // Cancel the sending of chat message by player.
-        event.setCancelled(true);
-        // Mock the message sent by the player.
-        String playerMessage = mockMessage(event.getMessage());
-        // Send the mocked message as if the player said it.
-        this._main.getServer().broadcastMessage(String.format("<%s> %s", player.getDisplayName(), playerMessage));
+        this.sendMessage(event);
     }
 
     /**
@@ -48,5 +50,23 @@ public class MockerListener implements Listener {
             }
         }
         return new String(messageAsArr);
+    }
+
+    /**
+     * Send the player's chat message in a mocking manner.
+     *
+     * @param event - The chat event.
+     */
+    private void sendMessage(AsyncPlayerChatEvent event) {
+        // Cancel the sending of chat message by player.
+        event.setCancelled(true);
+        // Mock the message sent by the player.
+        String playerMessage = mockMessage(event.getMessage());
+        // Send the mocked message as if the player said it.
+        this._main.getServer().broadcastMessage(
+                String.format("<%s> %s",
+                        event.getPlayer().getDisplayName(),
+                        playerMessage)
+        );
     }
 }
