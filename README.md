@@ -11,7 +11,12 @@ Each mocked player will get their chat messages modified in a spectacular <itali
 
 ### Example:
 
-<img src="./images/example.png" style="width: 55%">
+<img src="./images/example.png" style="width: 65%">
+
+> #### Toggling mocking of a player
+
+<img src="./images/mock_demo.gif" style="width: 65%">
+
 
 ## Usage:
 
