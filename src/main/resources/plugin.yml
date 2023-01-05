@@ -8,3 +8,9 @@ commands:
     description: Toggle mocking of a player
     usage: /<command> <player>
     permission: mocker.mock
+    permission-message: You do not have permission.
+  reload:
+    description: Reload the plugin
+    usage: /<command>
+    permission: mocker.reload
+    permission-message: You do not have permission.

@@ -16,7 +16,7 @@ public final class Mocker extends JavaPlugin {
     private final FileHelper _fileHelper = new FileHelper(this, _pluginHelper);
     private ArrayList<String> _mockedUsers = (new ArrayList<>());
     private final MockerCommands _commands = new MockerCommands(_fileHelper, _pluginHelper, _mockedUsers);
-    private final MockerListener _listener = new MockerListener(this, _config, _mockedUsers);
+    private final MockerListener _listener = new MockerListener(this, _mockedUsers);
 
     @Override
     public void onEnable() {
@@ -26,7 +26,11 @@ public final class Mocker extends JavaPlugin {
         this.setDefaultData();
 
         this._mockedUsers = (ArrayList<String>) _fileHelper.getMockedUsers().getStringList("mocked");
-        this.getCommand("mock").setExecutor(_commands);
+        // Register all commands
+        ArrayList<String> pluginCommands = _commands.getCommands();
+        for (String command : pluginCommands) {
+            getCommand(command).setExecutor(_commands);
+        }
     }
 
     /**

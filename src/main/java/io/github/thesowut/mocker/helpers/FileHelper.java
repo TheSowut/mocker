@@ -51,6 +51,14 @@ public class FileHelper {
     }
 
     /**
+     * Reload the plugin data files.
+     */
+    public void reload() {
+        _main.reloadConfig();
+        _mockedUsersConfig = YamlConfiguration.loadConfiguration(_mockedUsers);
+    }
+
+    /**
      * Try creating a file.
      *
      * @param file - File to be created.
@@ -64,4 +72,6 @@ public class FileHelper {
             }
         }
     }
+
+
 }
