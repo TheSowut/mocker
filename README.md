@@ -17,9 +17,11 @@ Each mocked player will get their chat messages modified in a spectacular <itali
 
 #### Commands:
 - /mock \<player\> - toggle mocking of a player persists throughout restarts
+- /mocker:reload - reloads the plugin configuration
 
 #### Permissions:
 - mocker.mock
+- mocker.reload
 
 ## Planned Features:
-- Toggle mocking for all non-op users
+- ✔️ Toggle mocking for all non-op users
