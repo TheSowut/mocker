@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileHelper {
+    public enum ConfigKeys {
+        mock_non_op_users
+    }
     private final Mocker _main;
     private final PluginHelper _pluginHelper;
     private File _mockedUsers;
@@ -51,6 +54,15 @@ public class FileHelper {
     }
 
     /**
+     * Get mock_non_op_users flag value from config.yml
+     *
+     * @return Whether all non op players should be mocked.
+     */
+    public boolean shouldMockAllNonOpPlayers() {
+        return _main.getConfig().get(String.valueOf(ConfigKeys.mock_non_op_users)).equals(true);
+    }
+
+    /**
      * Reload the plugin data files.
      */
     public void reload() {
@@ -72,6 +84,4 @@ public class FileHelper {
             }
         }
     }
-
-
 }
